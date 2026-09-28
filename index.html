@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guess the Tech</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14123a;--bg2:#221d63;--card:#fff;--ink:#14123a;--blue:#3d7bff;--sun:#ffd23f;--mint:#2fd394;--mute:#b9b6e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100vh;background:var(--bg);color:#fff;font-family:"Space Grotesk",system-ui,sans-serif;overflow-x:hidden}
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.55;z-index:0;pointer-events:none;animation:drift 18s ease-in-out infinite alternate}
+.b1{width:46vmax;height:46vmax;background:#3d7bff;top:-18vmax;left:-14vmax}
+.b2{width:38vmax;height:38vmax;background:#8a3dff;bottom:-16vmax;right:-10vmax;animation-delay:-9s}
+@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:16px;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:clamp(30px,6vw,52px);letter-spacing:.02em;margin:0;line-height:1;text-shadow:0 3px 0 #0a0926,0 0 24px rgba(61,123,255,.6)}
+.count{font-weight:700;background:rgba(255,255,255,.12);padding:8px 14px;border-radius:99px;white-space:nowrap}
+.bar{height:8px;background:rgba(255,255,255,.14);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:2%;background:linear-gradient(90deg,var(--blue),var(--sun));border-radius:9px;transition:width .5s cubic-bezier(.3,1.3,.5,1)}
+.stage{background:var(--card);color:var(--ink);border-radius:28px;padding:clamp(18px,4vw,44px);box-shadow:0 0 0 5px #0a0926,0 22px 0 -4px rgba(0,0,0,.25),0 30px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:22px;min-height:min(46vh,380px);justify-content:center;position:relative;overflow:hidden}
+.q{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(8px,2.4vw,26px)}
+.q span{font-size:clamp(64px,15vw,140px);line-height:1;display:inline-block;animation:pop .55s cubic-bezier(.2,1.6,.4,1) both;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif}
+.q b{font-family:Anton,sans-serif;font-weight:400;font-size:clamp(34px,8vw,76px);color:var(--blue);animation:pop .55s both}
+@keyframes pop{from{transform:scale(0) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.ans{display:flex;align-items:center;gap:14px;min-height:64px;font-family:Anton,sans-serif;font-size:clamp(30px,7vw,64px);color:#0d8a5b;letter-spacing:.02em;text-align:center}
+.ans svg{width:clamp(38px,7vw,64px);flex:none}
+.ans path{stroke:var(--mint);stroke-width:12;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100}
+.ans.on path{animation:draw .5s .1s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.ans em{font-style:normal;display:inline-block}
+.ans.on em{animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes drop{from{transform:translateY(-40px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.ans.off{color:#b3b1d1;font-size:clamp(18px,3.4vw,26px);font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:.3em}
+.ans.off svg{display:none}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+button{font:inherit;font-weight:700;border:0;cursor:pointer;color:inherit;border-radius:16px;padding:14px 22px;transition:transform .15s,box-shadow .15s,background .2s}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.reveal{background:var(--sun);color:var(--ink);font-size:clamp(18px,3vw,24px);padding:16px 38px;box-shadow:0 6px 0 #c99a00;animation:pulse 2s infinite}
+.reveal:active{transform:translateY(5px);box-shadow:0 1px 0 #c99a00}
+.reveal.done{background:var(--mint);box-shadow:0 6px 0 #158a5f;animation:none}
+@keyframes pulse{50%{transform:scale(1.045)}}
+.nav{display:flex;gap:12px;justify-content:space-between;align-items:center}
+.nav button,.ghost{background:rgba(255,255,255,.12)}
+.nav button:hover,.ghost:hover{background:rgba(255,255,255,.22)}
+.nav .next{background:var(--blue);box-shadow:0 5px 0 #1f4fc4;flex:1;max-width:260px}
+.nav .prev{flex:0 1 auto}
+.tools{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tools button{padding:10px 16px;font-size:14px}
+.grid{display:none;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px}
+.grid.open{display:grid;animation:pop .35s both}
+.grid button{padding:10px 0;background:rgba(255,255,255,.1);border-radius:12px}
+.grid button.seen{background:rgba(61,123,255,.55)}
+.grid button.rev{background:var(--mint);color:var(--ink)}
+.grid button.cur{outline:3px solid var(--sun)}
+.conf{position:absolute;top:50%;left:50%;width:10px;height:14px;border-radius:2px;pointer-events:none;animation:fly 1s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+.tip{text-align:center;color:var(--mute);font-size:13px}
+@media(max-width:560px){.nav .next{max-width:none}.stage{border-radius:22px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+:root[data-x]{}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="wrap">
+  <header><h1>GUESS THE TECH</h1><div class="count" id="count">1 / 50</div></header>
+  <div class="bar"><i id="bar"></i></div>
+  <main class="stage" id="stage">
+    <div class="q" id="q" aria-live="polite"></div>
+    <div class="ans off" id="ans"></div>
+    <div class="row"><button class="reveal" id="rev">Reveal answer</button></div>
+  </main>
+  <div class="nav">
+    <button class="prev" id="prev">Previous</button>
+    <button class="ghost" id="list">All questions</button>
+    <button class="next" id="next">Next question</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="tools"><button class="ghost" id="shuf">Shuffle order</button><button class="ghost" id="reset">Reset</button><button class="ghost" id="full">Full screen</button></div>
+  <div class="tip">Keys: Space reveals, arrow keys move between questions</div>
+</div>
+<script>
+const Q=[
+["🟦🦷","Bluetooth"],["🔥🧱","Firewall"],["🐞","Bug"],["☁️💾","Cloud Storage"],["🕷️🤖","Web Crawler"],
+["🌍🕸️","World Wide Web"],["🐍","Python"],["☕","Java"],["💎","Ruby"],["🦀","Rust"],
+["🐧","Linux"],["🪟","Windows"],["🍪","Cookies"],["🎣📧","Phishing"],["🐴","Trojan Horse"],
+["🪱","Worm"],["🦠💻","Computer Virus"],["🔒🔑","Encryption"],["⛓️🧱","Blockchain"],["🟠🪙","Bitcoin"],
+["🧠🤖","Artificial Intelligence"],["🧠🕸️","Neural Network"],["💬🤖","Chatbot"],["🐳📦","Docker"],["🐙🐱","GitHub"],
+["0️⃣1️⃣🌳","Binary Tree"],["🥞","Stack"],["🧍🧍🧍","Queue"],["🔗📋","Linked List"],["🔁","Loop"],
+["♾️🔁","Infinite Loop"],["🧩🔌","Plugin"],["📶","Wi-Fi"],["🐭💻","Mouse"],["🍓🥧","Raspberry Pi"],
+["📱🏪","App Store"],["🖥️🧠","CPU"],["🐏","RAM"],["🚗🤖","Self-Driving Car"],["🥽","Virtual Reality"],
+["👁️💻","Computer Vision"],["🛰️📍","GPS"],["🥫","Spam"],["🔎⚙️","Search Engine"],["🐘📊","Big Data"],
+["🎭🎥","Deepfake"],["🦾","Robotics"],["✈️📴","Airplane Mode"],["🔄🔌","Reboot"],["⚫🎩💻","Black Hat Hacker"]
+];
+const $=id=>document.getElementById(id);
+let order=Q.map((_,i)=>i),i=0,shown=new Set(),revd=new Set();
+const check='<svg viewBox="0 0 100 80"><path d="M8 42 L36 68 L92 10" pathLength="100"/></svg>';
+function seg(s){return [...new Intl.Segmenter('en',{granularity:'grapheme'}).segment(s)].map(x=>x.segment)}
+function render(){
+  const [e,a]=Q[order[i]];shown.add(i);
+  const parts=seg(e),q=$('q');q.innerHTML='';
+  parts.forEach((p,k)=>{
+    if(k){const b=document.createElement('b');b.textContent='+';b.style.animationDelay=(k*.12-.06)+'s';q.appendChild(b)}
+    const s=document.createElement('span');s.textContent=p;s.style.animationDelay=(k*.12)+'s';q.appendChild(s)
+  });
+  const an=$('ans'),r=revd.has(i);
+  an.className='ans '+(r?'on':'off');
+  an.innerHTML=r?check+'<em>'+a+'</em>':a.replace(/[A-Za-z0-9]/g,'_').split(' ').join('   ').split('').join(' ').replace(/-/g,'-');
+  if(!r)an.innerHTML=a.split(' ').map(w=>'_ '.repeat(w.replace(/-/g,'').length).trim()).join('&nbsp;&nbsp;&nbsp;');
+  const rv=$('rev');rv.textContent=r?'Answer shown':'Reveal answer';rv.classList.toggle('done',r);
+  $('count').textContent=(i+1)+' / '+Q.length;
+  $('bar').style.width=((i+1)/Q.length*100)+'%';
+  $('prev').disabled=i===0;$('prev').style.opacity=i===0?.4:1;
+  $('next').textContent=i===Q.length-1?'Finish':'Next question';
+  drawGrid();
+}
+function drawGrid(){
+  const g=$('grid');g.innerHTML='';
+  order.forEach((_,n)=>{const b=document.createElement('button');b.textContent=n+1;
+    b.className=(revd.has(n)?'rev ':shown.has(n)?'seen ':'')+(n===i?'cur':'');
+    b.onclick=()=>{i=n;render()};g.appendChild(b)})
+}
+function burst(){
+  const st=$('stage'),cols=['#3d7bff','#ffd23f','#2fd394','#ff5d8f','#8a3dff'];
+  for(let n=0;n<34;n++){const c=document.createElement('i');c.className='conf';
+    c.style.background=cols[n%5];
+    c.style.setProperty('--x',(Math.random()*640-320)+'px');
+    c.style.setProperty('--y',(Math.random()*-300-20)+'px');
+    c.style.setProperty('--r',(Math.random()*720)+'deg');
+    st.appendChild(c);setTimeout(()=>c.remove(),1100)}
+}
+function reveal(){if(revd.has(i))return;revd.add(i);render();burst()}
+function go(d){
+  const n=i+d;
+  if(n<0)return;
+  if(n>=Q.length){$('ans').className='ans on';$('ans').innerHTML=check+'<em>Quiz complete</em>';burst();return}
+  i=n;render()
+}
+$('rev').onclick=reveal;$('next').onclick=()=>go(1);$('prev').onclick=()=>go(-1);
+$('list').onclick=()=>$('grid').classList.toggle('open');
+$('shuf').onclick=()=>{order.sort(()=>Math.random()-.5);i=0;shown=new Set();revd=new Set();render()};
+$('reset').onclick=()=>{order=Q.map((_,k)=>k);i=0;shown=new Set();revd=new Set();render()};
+$('full').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1);
+  else if(e.key===' '&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();reveal()}
+});
+render();
+</script>
+</body>
+</html>
